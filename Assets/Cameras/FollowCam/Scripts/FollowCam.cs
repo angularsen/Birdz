@@ -28,11 +28,11 @@ class FollowCam : MonoBehaviour
     public Transform Target;
 
     private Transform _prevTargetTransform;
-    private Transform _prevTransform;
+//    private Transform _prevTransform;
 
     void Start()
     {
-        _prevTransform = transform;
+//        _prevTransform = transform;
         _prevTargetTransform = Target;
     }
 
@@ -59,7 +59,7 @@ class FollowCam : MonoBehaviour
         Vector3 lookAheadOffset = GetLookAheadOffset(dt);
         transform.LookAt(Target.position + lookAheadOffset, Target.up);
         _prevTargetTransform = Target;
-        _prevTransform = transform;
+//        _prevTransform = transform;
     }
 
     Vector3 GetLookAheadOffset(float dt)
