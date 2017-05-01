@@ -6,7 +6,9 @@ using UnityEngine.SceneManagement;
 
 public static class AnimatorParams
 {
+    public const string FlapSpeedMultiplier = "FlapSpeedMultiplier";
     public const string Speed = "Speed m:s";
+    public const string ThrustInput = "ThrustInput";
 }
 
 class Parrot : MonoBehaviour
@@ -27,22 +29,22 @@ class Parrot : MonoBehaviour
 
     private Transform _prevTransform;
 
-    // Forward velocity has little drag, but sideways or up/downwards velocity has very high drag
-    // to help change the velocity vector when pitching to do a climb or a banking turn
-    // Body drag of 0.1 found on page 51 in 'Modelling Bird Flight': https://books.google.no/books?id=KG86AgWwFEUC&pg=PA73&lpg=PA73&dq=bird+drag+coefficient&source=bl&ots=RuK6WpSQWJ&sig=S3HbzUEQVtMxQ69gZyKGqvXzAO0&hl=en&sa=X&ved=0ahUKEwjU7KnZrsrTAhWCbZoKHcdJDTcQ6AEIkQEwFg#v=onepage&q=bird%20drag%20coefficient&f=false
-    public Vector3 BodyDragFactors = new Vector3(0.1f, 0.1f, 0.1f);
+    // Forward velocity has little drag, but sideways or up/downwards velocity has much higher drag coefficients.
+    // Forward body drag of 0.1 found on page 51 in 'Modelling Bird Flight': https://books.google.no/books?id=KG86AgWwFEUC&pg=PA73&lpg=PA73&dq=bird+drag+coefficient&source=bl&ots=RuK6WpSQWJ&sig=S3HbzUEQVtMxQ69gZyKGqvXzAO0&hl=en&sa=X&ved=0ahUKEwjU7KnZrsrTAhWCbZoKHcdJDTcQ6AEIkQEwFg#v=onepage&q=bird%20drag%20coefficient&f=false
+    public Vector3 BodyDragFactors = new Vector3(0.1f, 1f, 0.001f);
 
     public float MassKg = 1.0f;
     public float MaxPitchRateDps = 90;
     public float MaxRollRateDps = 180;
     public float MaxThrustN = 10;
 
-    public float MaxYawRateDps = 90;
+    public float MaxYawRateDps = 30;
 
 //    public float LiftFactor = 10f;
     public float RotateIntoWindLerpFactor = .7f;
 
     public float DragCoefficient = 0.001f;
+    public float LiftCoefficient = 0.1f;
 
 //    /// <summary>
 //    ///     Meters traveled forward per meter altitude lost.
@@ -51,7 +53,7 @@ class Parrot : MonoBehaviour
 
     private float GetLiftCoefficient(float angleOfAttackDeg)
     {
-        return DragCoefficient * 1000;
+        return LiftCoefficient;
 //        float x = angleOfAttackDeg;
 //        float x2 = x * x;
 //        float x3 = x * x2;
@@ -108,7 +110,8 @@ class Parrot : MonoBehaviour
     void FixedUpdate()
     {
         float dt = Time.fixedDeltaTime;
-        float thrustForce = (Input.GetAxis("Thrust") - Input.GetAxis("Brake")) * MaxThrustN;
+        float thrustInput = Input.GetAxis("Thrust");
+        float thrustForce = (thrustInput - Input.GetAxis("Brake")) * MaxThrustN;
         float rollDelta = -Input.GetAxis("Roll") * MaxRollRateDps * dt;
         float pitchDelta = Input.GetAxis("Pitch") * MaxPitchRateDps * dt;
         float yawDelta = Input.GetAxis("Yaw") * MaxYawRateDps * dt;
@@ -129,7 +132,6 @@ class Parrot : MonoBehaviour
 //        Transform prevTransform = transform;
         float prevFwdSpeed = prevLocalVelocity.z;
         float prevFwdSpeed2 = prevFwdSpeed * prevFwdSpeed;
-//        Vector3 vector3 = Vector3.Scale(prevLocalVelocity, Vector3.forward);
         int angleOfAttackSign = prevLocalVelocity.y < 0 ? +1 : -1;
         float prevAngleOfAttackDeg = prevLocalVelocity.magnitude < 0.1
             ? 0
@@ -144,7 +146,6 @@ class Parrot : MonoBehaviour
         Vector3 localBodyDrag = -Vector3.Scale(prevLocalVelocity2, BodyDragFactors);
         Vector3 localLiftInducedDrag = Vector3.back * prevFwdSpeed2 * GetDragCoefficient(prevAngleOfAttackDeg);
         Vector3 localDrag = localBodyDrag + localLiftInducedDrag;
-        //        Vector3 drag = Vector3.Scale(prevVelocity, DragFactors);
         Vector3 totalLocalForce = localThrust + localDrag + localLift + localGravitationalForce;
         Vector3 totalLocalAccel = totalLocalForce / MassKg;
 
@@ -156,20 +157,20 @@ class Parrot : MonoBehaviour
         transform.position += worldDisplacement;
         transform.Rotate(rotationInputEuler, Space.Self);
 
-        // Change velocity by acceleration.
-        // Transfer old forward velocity into new forward direction>
-
+        // Update animator parameters
         float newFwdSpeed = newLocalVelocity.z;
         _animator.SetFloat(AnimatorParams.Speed, newFwdSpeed);
+        _animator.SetFloat(AnimatorParams.ThrustInput, thrustInput);
+        _animator.SetFloat(AnimatorParams.FlapSpeedMultiplier, 1 + thrustInput * 2);
 
         _prevTransform = prevTransform;
         _localVelocity = newLocalVelocity;
 
-        Vector3 velocityKmh = _localVelocity * 3.6f;
+        Vector3 localVelocityKmh = _localVelocity * 3.6f;
         float forwardSpeedKmh = newFwdSpeed * 3.6f;
         var i = 0;
         DebugLabels[i++] = string.Format("Accel[{0}={1} m/s²]", totalLocalAccel, totalLocalAccel.magnitude);
-        DebugLabels[i++] = string.Format("Speed[{0}={1} km/h], F.Speed[{2} km/h]", velocityKmh, velocityKmh.magnitude,
+        DebugLabels[i++] = string.Format("Speed[{0}={1} km/h], F.Speed[{2} km/h]", localVelocityKmh, localVelocityKmh.magnitude,
             forwardSpeedKmh);
         DebugLabels[i++] = string.Format("Angle of attack [{0}]", prevAngleOfAttackDeg);
 //        _debugLabels[i++] = string.Format("Drag[{0}={1}]", dragForce, dragForce.magnitude);
