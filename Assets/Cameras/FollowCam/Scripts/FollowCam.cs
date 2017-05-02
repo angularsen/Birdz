@@ -7,10 +7,10 @@ using UnityEngine;
 class FollowCam : MonoBehaviour
 {
     // Distance behind the target
-    public float Distance = 5.0f;
+    public float Distance = 1.0f;
 
     // Height above the target
-    public float Height = 1.0f;
+    public float Height = 0.25f;
 
     public LookAheadDirectionType LookAheadDirection = LookAheadDirectionType.TargetVelocity;
 
@@ -27,13 +27,14 @@ class FollowCam : MonoBehaviour
     /// <summary>Target to follow and look in relation to.</summary>
     public Transform Target;
 
-    private Transform _prevTargetTransform;
-//    private Transform _prevTransform;
+    private Vector3 _prevTargetPosition;
+    private float _prevTargetTime;
+    private Vector3 _prevLookAheadOffset;
 
     void Start()
     {
-//        _prevTransform = transform;
-        _prevTargetTransform = Target;
+        _prevTargetPosition = Target.position;
+        _prevLookAheadOffset = Vector3.zero;
     }
 
     void LateUpdate()
@@ -42,13 +43,14 @@ class FollowCam : MonoBehaviour
             return;
 
         float dt = Time.deltaTime;
-
+        Vector3 lookAheadOffset = GetLookAheadOffset();
+//        Vector3 wantedPosition = Target.position + (Target.up * Height - lookAheadOffset.normalized * Distance);
         Vector3 wantedPosition = Target.position + (Target.up * Height - Target.forward * Distance);
-        Vector3 springAcceleration = (wantedPosition - transform.position) * SpringFactor * SpringFactor;
-        Vector3 totalAcceleration = springAcceleration;
 
         if (Smooth)
         {
+            Vector3 springAcceleration = (wantedPosition - transform.position) * SpringFactor * SpringFactor;
+            Vector3 totalAcceleration = springAcceleration;
             transform.position += 0.5f * totalAcceleration * dt * dt;
         }
         else
@@ -56,27 +58,37 @@ class FollowCam : MonoBehaviour
             transform.position = wantedPosition;
         }
 
-        Vector3 lookAheadOffset = GetLookAheadOffset(dt);
+        // Ease into changes of look at rotation by .5 seconds
+        //        transform.rotation = Quaternion.Lerp(transform.rotation,
+        //            Quaternion.LookRotation(Target.position + lookAheadOffset, Target.up), 0.5f * dt);
         transform.LookAt(Target.position + lookAheadOffset, Target.up);
-        _prevTargetTransform = Target;
-//        _prevTransform = transform;
     }
 
-    Vector3 GetLookAheadOffset(float dt)
+    Vector3 GetLookAheadOffset()
     {
-        Vector3 targetVelocity = _prevTargetTransform == null
-            ? Vector3.zero
-            : (Target.position - _prevTargetTransform.position) / dt;
+        float targetDisplacementTime = Time.time - _prevTargetTime;
+        if (targetDisplacementTime < 0.02f)
+        {
+            return _prevLookAheadOffset;
+        }
+        Vector3 targetDisplacement = Target.position - _prevTargetPosition;
+        Vector3 targetVelocity = targetDisplacement / targetDisplacementTime;
+        if (targetVelocity.magnitude < 0.1f)
+        {
+            return Vector3.zero;
+        }
+        _prevTargetPosition = Target.position;
+        _prevTargetTime = Time.time;
 
         float lookAheadDistance = Mathf.Min(MaxLookAheadDistance, targetVelocity.magnitude * LookAheadTime);
         Vector3 lookAheadDirection;
         switch (LookAheadDirection)
         {
             case LookAheadDirectionType.TargetVelocity:
-                lookAheadDirection = targetVelocity;
+                lookAheadDirection = targetDisplacement.normalized;
                 break;
             case LookAheadDirectionType.TargetForward:
-                lookAheadDirection = Target.rotation * Vector3.forward;
+                lookAheadDirection = Target.forward;
                 break;
             default:
                 throw new NotImplementedException("LookAheadDirectionType: " + LookAheadDirection);
@@ -84,6 +96,7 @@ class FollowCam : MonoBehaviour
 
         // Always look at the target
         Vector3 lookAheadOffset = lookAheadDirection * lookAheadDistance;
+        _prevLookAheadOffset = lookAheadOffset;
         return lookAheadOffset;
     }
 }

@@ -166,7 +166,7 @@ ModelImporter:
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
-    motionNodeName: 
+    motionNodeName: NParrot/Bip01_Pelvis
     rigImportErrors: 
     rigImportWarnings: 
     animationImportErrors: 

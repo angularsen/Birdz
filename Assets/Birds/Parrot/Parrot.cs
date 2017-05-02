@@ -127,7 +127,7 @@ class Parrot : MonoBehaviour
         Vector3 prevWorldVelocity = prevTransform.TransformVector(prevLocalVelocity);
         Quaternion worldRotationIntoWind = Quaternion.LookRotation(prevWorldVelocity, prevTransform.up);
         prevTransform.rotation = Quaternion.Lerp(prevTransform.rotation, worldRotationIntoWind,
-            RotateIntoWindLerpFactor * prevLocalVelocity.magnitude * dt);
+            RotateIntoWindLerpFactor * prevLocalVelocity2.magnitude * dt);
 
 //        Transform prevTransform = transform;
         float prevFwdSpeed = prevLocalVelocity.z;
