@@ -1,8 +1,15 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 // ReSharper disable ArrangeTypeMemberModifiers, ArrangeTypeModifiers, FieldCanBeMadeReadOnly.Global, ConvertToConstant.Global, CheckNamespace, MemberCanBePrivate.Global, UnassignedField.Global, UnusedMember.Local, UnusedMember.Global
+
+public enum Layers
+{
+    Player = 8,
+    PlayerRagdoll = 9
+}
 
 public static class AnimatorParams
 {
@@ -104,6 +111,45 @@ class Parrot : MonoBehaviour
 
         // Start with a forward velocity
         _localVelocity = Vector3.forward * 10;
+
+        // Ignore collisions between player bounding box (for collision detection) and its ragdoll colliders (for ragdoll effect)
+        Physics.IgnoreLayerCollision((int)Layers.Player, (int)Layers.PlayerRagdoll);
+        SetRagdollEnabled(false);
+    }
+
+    private void SetRagdollEnabled(bool isEnabled)
+    {
+        List<Collider> ragdollColliders = GetComponentsInChildren<Collider>()
+            .Where(InRagdollLayer)
+            .ToList();
+        List<Rigidbody> ragdollBodies = ragdollColliders
+            .Select(col => col.gameObject.GetComponent<Rigidbody>())
+            .Where(body => body != null)
+            .ToList();
+
+        Collider mainCollider = GetComponentsInChildren<Collider>().First(col => !InRagdollLayer(col));
+        mainCollider.enabled = !isEnabled;
+        Rigidbody mainBody = GetComponent<Rigidbody>();
+        mainBody.detectCollisions = !isEnabled;
+
+        foreach (Collider col in ragdollColliders)
+        {
+            col.enabled = isEnabled;
+            col.isTrigger = !isEnabled;
+        }
+        foreach (Rigidbody body in ragdollBodies)
+        {
+            body.isKinematic = !isEnabled;
+            body.detectCollisions = isEnabled;
+            body.velocity = transform.TransformVector(_localVelocity);
+            body.angularVelocity = Vector3.zero;
+        }
+
+        // Disable kinematic scripts (let physics take control)
+        IsKinematic = !isEnabled;
+
+        // Disable animation to enable ragdoll control of limbs
+        _animator.enabled = !isEnabled;
     }
 
     void Update()
@@ -229,21 +275,18 @@ class Parrot : MonoBehaviour
         {
             Debug.Log("Hit ground: " + col.name);
 //            transform.position -= _localVelocity.normalized;
-            IsKinematic = false;
-            var rigidBody = GetComponent<Rigidbody>();
-            rigidBody.isKinematic = false;
-            rigidBody.velocity = transform.TransformVector(_localVelocity);
-            rigidBody.angularVelocity = Vector3.zero;
-
-            foreach (Collider birdCollider in GetComponentsInChildren<Collider>())
-            {
-                // Disable trigger so that it will interact with the bird's RigidBody
-                birdCollider.isTrigger = false;
-            }
+            SetRagdollEnabled(true);
         }
         else
         {
             Debug.Log("HIT " + col.name);
+            SetRagdollEnabled(true);
         }
     }
+
+    private static bool InRagdollLayer(Component body)
+    {
+        return body.gameObject.layer == (int)Layers.PlayerRagdoll;
+    }
+
 }
