@@ -46,6 +46,12 @@ class Parrot : MonoBehaviour
     public float DragCoefficient = 0.001f;
     public float LiftCoefficient = 0.1f;
 
+    /// <summary>
+    ///     True if currently in ragdoll/physics state, such as after colliding.
+    ///     All direct manipulations of <see cref="GameObject.transform" /> will be skipped during this state.
+    /// </summary>
+    public bool IsKinematic;
+
 //    /// <summary>
 //    ///     Meters traveled forward per meter altitude lost.
 //    /// </summary>
@@ -104,11 +110,16 @@ class Parrot : MonoBehaviour
     {
         // TODO Move me to a game manager object instead
         if (Input.GetButtonDown("Reset"))
+        {
+            IsKinematic = true;
             SceneManager.LoadScene(0);
+        }
     }
 
     void FixedUpdate()
     {
+        if (!IsKinematic) return;
+
         float dt = Time.fixedDeltaTime;
         float thrustInput = Input.GetAxis("Thrust");
         float thrustForce = (thrustInput - Input.GetAxis("Brake")) * MaxThrustN;
@@ -209,15 +220,30 @@ class Parrot : MonoBehaviour
         }
     }
 
-//    void OnCollisionEnter(Collision collision)
-//    {
-//        transform.position += 10 * Vector3.up;
-//        collision.
-//        }
-
     void OnTriggerEnter(Collider col)
     {
-        Debug.LogError("HIT");
-        transform.position += 10 * Vector3.up;
+//        transform.position += 10 * Vector3.up;
+
+//        _localVelocity = Vector3.zero;
+        if (col.name.StartsWith("Terrain "))
+        {
+            Debug.Log("Hit ground: " + col.name);
+//            transform.position -= _localVelocity.normalized;
+            IsKinematic = false;
+            var rigidBody = GetComponent<Rigidbody>();
+            rigidBody.isKinematic = false;
+            rigidBody.velocity = transform.TransformVector(_localVelocity);
+            rigidBody.angularVelocity = Vector3.zero;
+
+            foreach (Collider birdCollider in GetComponentsInChildren<Collider>())
+            {
+                // Disable trigger so that it will interact with the bird's RigidBody
+                birdCollider.isTrigger = false;
+            }
+        }
+        else
+        {
+            Debug.Log("HIT " + col.name);
+        }
     }
 }

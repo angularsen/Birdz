@@ -101,6 +101,12 @@ class FollowCam : MonoBehaviour
     }
 }
 
+enum FollowType
+{
+    FixedRelativeToLocal,
+    FollowTrail,
+}
+
 enum LookAheadDirectionType
 {
     TargetVelocity,
