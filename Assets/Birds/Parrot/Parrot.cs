@@ -83,9 +83,13 @@ class Parrot : MonoBehaviour
 //    public float LiftFactor = 10f;
     public float RotateIntoWindLerpFactor = .7f;
 
+    /// <summary>Audio source for the airflow of winds and when moving in air.</summary>
+    private AudioSource _audioAirflow;
+
     void Start()
     {
         _animator = GetComponentInChildren<Animator>();
+        _audioAirflow = GameObject.Find("AudioSourceAirflow").GetComponent<AudioSource>();
         _prevTransform = transform;
 
         // Start with a forward velocity
@@ -166,17 +170,18 @@ class Parrot : MonoBehaviour
         transform.position += worldDisplacement;
         transform.Rotate(rotationInputEuler, Space.Self);
 
-        // Update animator parameters
+        Vector3 localVelocityKmh = newLocalVelocity * 3.6f;
         float newFwdSpeed = newLocalVelocity.z;
+        float forwardSpeedKmh = newFwdSpeed * 3.6f;
+
+        // Update animator parameters
         _animator.SetFloat(AnimatorParams.Speed, newFwdSpeed);
         _animator.SetFloat(AnimatorParams.ThrustInput, thrustInput);
         _animator.SetFloat(AnimatorParams.FlapSpeedMultiplier, 1 + thrustInput * 2);
 
-        _prevTransform = prevTransform;
-        _localVelocity = newLocalVelocity;
+        // Update audio parameters
+        UpdateAirflowAudioByVelocity(newLocalVelocity);
 
-        Vector3 localVelocityKmh = _localVelocity * 3.6f;
-        float forwardSpeedKmh = newFwdSpeed * 3.6f;
         var i = 0;
         DebugLabels[i++] = string.Format("Accel[{0}={1} m/s²]", totalLocalAccel, totalLocalAccel.magnitude);
         DebugLabels[i++] = string.Format("Speed[{0}={1} km/h], F.Speed[{2} km/h]", localVelocityKmh,
@@ -199,11 +204,9 @@ class Parrot : MonoBehaviour
 //
 //        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(totalLocalAccel), Color.magenta);
 //        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(newLocalVelocity), Color.red);
-    }
 
-    float Angle360ToPlusMinus180(float angleDeg)
-    {
-        return angleDeg > 180 ? angleDeg - 360 : angleDeg;
+        _prevTransform = prevTransform;
+        _localVelocity = newLocalVelocity;
     }
 
     void OnGUI()
@@ -218,6 +221,7 @@ class Parrot : MonoBehaviour
         }
     }
 
+
     void OnTriggerEnter(Collider col)
     {
 //        transform.position += 10 * Vector3.up;
@@ -228,11 +232,15 @@ class Parrot : MonoBehaviour
             Debug.Log("Hit ground: " + col.name);
 //            transform.position -= _localVelocity.normalized;
             SetRagdollEnabled(true);
+            _localVelocity = Vector3.zero;
+            UpdateAirflowAudioByVelocity(Vector3.zero);
         }
         else
         {
             Debug.Log("HIT " + col.name);
             SetRagdollEnabled(true);
+            _localVelocity = Vector3.zero;
+            UpdateAirflowAudioByVelocity(Vector3.zero);
         }
     }
 
@@ -316,4 +324,15 @@ class Parrot : MonoBehaviour
         _animator.enabled = !isEnabled;
     }
 
+    private void UpdateAirflowAudioByVelocity(Vector3 newLocalVelocity)
+    {
+        float audioLerpBySpeed = Mathf.InverseLerp(0, 15, newLocalVelocity.magnitude);
+        _audioAirflow.volume = audioLerpBySpeed;
+        _audioAirflow.pitch = Mathf.Lerp(0.5f, 2f, audioLerpBySpeed);
+    }
+
+    private float Angle360ToPlusMinus180(float angleDeg)
+    {
+        return angleDeg > 180 ? angleDeg - 360 : angleDeg;
+    }
 }
