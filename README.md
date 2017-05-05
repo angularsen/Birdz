@@ -10,6 +10,8 @@ https://www.youtube.com/playlist?list=PLeQJkSU8dQUtHPeY7_3xOsd-U2r_o1LBK
 ## Milestones
 - [x] Mechanics: Basic flight physics
 - [x] Mechanics: Crash when hitting ground or trees
+- [x] Mechanics: Follow cam
+- [x] Mechanics: Fixed cam
 - [x] Animation: Flap wings when thrusting
 - [ ] Animation: Gliding (replace current placeholder animation)
 - [x] Mechanics: Ragdoll death
