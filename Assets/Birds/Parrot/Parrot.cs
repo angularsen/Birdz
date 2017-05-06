@@ -86,10 +86,14 @@ class Parrot : MonoBehaviour
     /// <summary>Audio source for the airflow of winds and when moving in air.</summary>
     private AudioSource _audioAirflow;
 
+    /// <summary>Audio source for collisions.</summary>
+    private AudioSource _audioCollision;
+
     void Start()
     {
         _animator = GetComponentInChildren<Animator>();
         _audioAirflow = GameObject.Find("AudioSourceAirflow").GetComponent<AudioSource>();
+        _audioCollision = GameObject.Find("AudioSourceCollision").GetComponent<AudioSource>();
         _prevTransform = transform;
 
         // Start with a forward velocity
@@ -229,6 +233,7 @@ class Parrot : MonoBehaviour
 //        _localVelocity = Vector3.zero;
         if (col.name.StartsWith("Terrain "))
         {
+            _audioCollision.Play(0);
             Debug.Log("Hit ground: " + col.name);
 //            transform.position -= _localVelocity.normalized;
             SetRagdollEnabled(true);
@@ -237,6 +242,7 @@ class Parrot : MonoBehaviour
         }
         else
         {
+            _audioCollision.Play(0);
             Debug.Log("HIT " + col.name);
             SetRagdollEnabled(true);
             _localVelocity = Vector3.zero;
