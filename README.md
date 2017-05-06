@@ -22,3 +22,12 @@ https://www.youtube.com/playlist?list=PLeQJkSU8dQUtHPeY7_3xOsd-U2r_o1LBK
 - [ ] Mechanics: Local wind fields (must be visible to the player)
 - [ ] Menu to select mission
 - [ ] Multiplayer: Free flight
+
+## Input (Xbox controller / keyboard)
+- Thrust: Right trigger / Left shift
+- Brake: Left trigger / Left ctrl
+- Pitch: Left stick vertical / W,S
+- Roll: Left stick horizontal / A,D
+- Yaw: Right stick horizontal / Q,E
+- Restart level: Back button / Backspace
+- Menu: Start button / ESC
