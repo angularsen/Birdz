@@ -17,7 +17,7 @@ https://www.youtube.com/playlist?list=PLeQJkSU8dQUtHPeY7_3xOsd-U2r_o1LBK
 - [x] Mechanics: Ragdoll death
 - [x] Sound: Wing flapping
 - [x] Sound: Air flow dependending on speed and wind
-- [ ] Mission: Fly as fast as possible through a forest without crashing
+- [x] Mission: Fly as fast as possible through a forest without crashing
 - [ ] Mission: Land within a circle on the ground (timer, difficulty by launch angles, speeds or winds)
 - [ ] Mechanics: Local wind fields (must be visible to the player)
 - [ ] Menu to select mission
