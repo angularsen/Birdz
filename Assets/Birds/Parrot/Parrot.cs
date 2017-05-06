@@ -2,6 +2,7 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 // ReSharper disable ArrangeTypeMemberModifiers, ArrangeTypeModifiers, FieldCanBeMadeReadOnly.Global, ConvertToConstant.Global, CheckNamespace, MemberCanBePrivate.Global, UnassignedField.Global, UnusedMember.Local, UnusedMember.Global
 
@@ -37,6 +38,8 @@ static class Tags
 {
     internal const string Untagged = "Untagged";
     internal const string MainCamera = "MainCamera";
+    internal const string Player = "Player";
+    public const string Finish = "Finish";
 }
 
 // Place the script in the Camera-Control group in the component menu
@@ -93,11 +96,14 @@ class Parrot : MonoBehaviour
     /// <summary>Time when the flap animation started last time, used to apply thrust in sync with animation.</summary>
     private float _flapStartTime;
 
+
     void Start()
     {
         _animator = GetComponentInChildren<Animator>();
         _audioAirflow = GameObject.Find("AudioSourceAirflow").GetComponent<AudioSource>();
         _audioCollision = GameObject.Find("AudioSourceCollision").GetComponent<AudioSource>();
+//        _hud = GameObject.Find("HUDCanvas").GetComponent<Canvas>();
+
 //        _prevTransform = transform;
 
         // Start with a forward velocity
@@ -248,6 +254,10 @@ class Parrot : MonoBehaviour
             Crash(col);
         }
         else if (col.name.StartsWith("tree"))
+        {
+            Crash(col);
+        }
+        else if (col.tag == Tags.Finish)
         {
             Crash(col);
         }
