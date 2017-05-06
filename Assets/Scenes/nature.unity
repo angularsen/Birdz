@@ -24030,7 +24030,8 @@ MonoBehaviour:
   MassKg: 1
   MaxPitchRateDps: 90
   MaxRollRateDps: 180
-  MaxThrustN: 3
+  MaxThrustN: 100
+  MaxBrakeN: 3
   MaxYawRateDps: 30
   RotateIntoWindLerpFactor: 0.01
 --- !u!4 &1945001413 stripped

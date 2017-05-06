@@ -29,6 +29,7 @@ public class CameraSwitcher : MonoBehaviour
         _followCam = cameras.First(x => x.name == CameraNames.FollowCam);
         _fixedCam = cameras.First(x => x.name == CameraNames.FixedCam);
         _freeCam = cameras.First(x => x.name == CameraNames.FreeCam);
+        SwitchToCamera(_followCam);
     }
 
     // Update is called once per frame
@@ -75,9 +76,13 @@ public class CameraSwitcher : MonoBehaviour
             switchToCam.transform.SetPositionAndRotation(mainCamTrans.position, mainCamTrans.rotation);
         }
 
-        Debug.Log("Switching to camera: " + switchToCam);
+        Debug.Log("Switching to camera: " + switchToCam.name);
         foreach (Camera cam in _cameras)
-            // Enable camera and disable all others
-            cam.enabled = cam == switchToCam;
+        {
+            // Enable new camera and disable all others
+            bool isEnabled = cam == switchToCam;
+            cam.enabled = isEnabled;
+            cam.GetComponent<AudioListener>().enabled = isEnabled;
+        }
     }
 }

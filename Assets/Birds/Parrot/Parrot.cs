@@ -57,7 +57,7 @@ class Parrot : MonoBehaviour
     /// </summary>
     private Vector3 _localVelocity;
 
-    private Transform _prevTransform;
+//    private Transform _prevTransform;
 
     // Forward velocity has little drag, but sideways or up/downwards velocity has much higher drag coefficients.
     // Forward body drag of 0.1 found on page 51 in 'Modelling Bird Flight': https://books.google.no/books?id=KG86AgWwFEUC&pg=PA73&lpg=PA73&dq=bird+drag+coefficient&source=bl&ots=RuK6WpSQWJ&sig=S3HbzUEQVtMxQ69gZyKGqvXzAO0&hl=en&sa=X&ved=0ahUKEwjU7KnZrsrTAhWCbZoKHcdJDTcQ6AEIkQEwFg#v=onepage&q=bird%20drag%20coefficient&f=false
@@ -77,6 +77,7 @@ class Parrot : MonoBehaviour
     public float MaxPitchRateDps = 90;
     public float MaxRollRateDps = 180;
     public float MaxThrustN = 10;
+    public float MaxBrakeN = 3;
 
     public float MaxYawRateDps = 30;
 
@@ -89,19 +90,22 @@ class Parrot : MonoBehaviour
     /// <summary>Audio source for collisions.</summary>
     private AudioSource _audioCollision;
 
+    /// <summary>Time when the flap animation started last time, used to apply thrust in sync with animation.</summary>
+    private float _flapStartTime;
+
     void Start()
     {
         _animator = GetComponentInChildren<Animator>();
         _audioAirflow = GameObject.Find("AudioSourceAirflow").GetComponent<AudioSource>();
         _audioCollision = GameObject.Find("AudioSourceCollision").GetComponent<AudioSource>();
-        _prevTransform = transform;
+//        _prevTransform = transform;
 
         // Start with a forward velocity
         _localVelocity = Vector3.forward * 10;
 
         // Ignore collisions between player bounding box (for collision detection) and its ragdoll colliders (for ragdoll effect)
         Physics.IgnoreLayerCollision((int) Layers.Player, (int) Layers.PlayerRagdoll);
-        SetRagdollEnabled(false);
+        SetRagdollEnabled(false, transform.TransformVector(_localVelocity));
     }
 
     void Update()
@@ -126,8 +130,14 @@ class Parrot : MonoBehaviour
         if (!IsKinematic) return;
 
         float dt = Time.fixedDeltaTime;
+        float timeSinceFlapStart = Time.time - _flapStartTime;
+
+        // Only apply thrust during the downwards flap motion (0.5s time window from start of downwards flap animation)
         float thrustInput = Input.GetAxis(InputNames.Thrust);
-        float thrustForce = (thrustInput - Input.GetAxis(InputNames.Brake)) * MaxThrustN;
+        
+        float thrustInputWhenFlapping = thrustInput * Gaussian(timeSinceFlapStart, 0.1f, 0.01f);
+        float thrustForce = (thrustInputWhenFlapping) * MaxThrustN;
+        float brakeForce = Input.GetAxis(InputNames.Brake) * MaxBrakeN;
         float rollDelta = -Input.GetAxis(InputNames.Roll) * MaxRollRateDps * dt;
         float pitchDelta = Input.GetAxis(InputNames.Pitch) * MaxPitchRateDps * dt;
         float yawDelta = Input.GetAxis(InputNames.Yaw) * MaxYawRateDps * dt;
@@ -154,7 +164,7 @@ class Parrot : MonoBehaviour
             : angleOfAttackSign * Vector3.Angle(Vector3.forward,
                   new Vector3(0, prevLocalVelocity.y, prevLocalVelocity.z));
 
-        Vector3 localThrust = Vector3.forward * thrustForce;
+        Vector3 localThrust = Vector3.forward * (thrustForce - brakeForce);
         // Lift maxing out at 1G, to simulate bird controlling its own lift
         Vector3 localLift = Vector3.up * Mathf.Min(9.81f,
                                 prevFwdSpeed2 *
@@ -209,8 +219,13 @@ class Parrot : MonoBehaviour
 //        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(totalLocalAccel), Color.magenta);
 //        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(newLocalVelocity), Color.red);
 
-        _prevTransform = prevTransform;
+//        _prevTransform = prevTransform;
         _localVelocity = newLocalVelocity;
+    }
+
+    private static float Gaussian(float x, float xMax, float stdDev)
+    {
+        return Mathf.Exp(-(x - xMax) * (x - xMax) / 2 / (stdDev * stdDev));
     }
 
     void OnGUI()
@@ -225,29 +240,40 @@ class Parrot : MonoBehaviour
         }
     }
 
-
     void OnTriggerEnter(Collider col)
     {
-//        transform.position += 10 * Vector3.up;
-
-//        _localVelocity = Vector3.zero;
         if (col.name.StartsWith("Terrain "))
         {
-            _audioCollision.Play(0);
-            Debug.Log("Hit ground: " + col.name);
-//            transform.position -= _localVelocity.normalized;
-            SetRagdollEnabled(true);
-            _localVelocity = Vector3.zero;
-            UpdateAirflowAudioByVelocity(Vector3.zero);
+            // TODO Handle landing specifically
+            Crash(col);
         }
-        else
+        else if (col.name.StartsWith("tree"))
         {
-            _audioCollision.Play(0);
-            Debug.Log("HIT " + col.name);
-            SetRagdollEnabled(true);
-            _localVelocity = Vector3.zero;
-            UpdateAirflowAudioByVelocity(Vector3.zero);
+            Crash(col);
         }
+    }
+
+    private void Crash(Collider col)
+    {
+        Vector3 velocity = transform.TransformVector(_localVelocity);
+
+        // Increase collision volume with speed, and use a minimum volume of 5%
+        _audioCollision.volume = Mathf.Lerp(0.01f, 1, Mathf.InverseLerp(0, 30, velocity.magnitude));
+        _audioCollision.Play();
+
+        Debug.Log("Hit ground: " + col.name);
+
+        SetRagdollEnabled(true, velocity);
+
+        _localVelocity = Vector3.zero;
+        UpdateAirflowAudioByVelocity(Vector3.zero);
+    }
+
+    // Called by ParrotModel->AnimationSoundPlayer via SendMessageUpwards()
+    void OnAnimationFlapStart()
+    {
+        Debug.Log("SendMessageUpwards RECEIVED");
+        _flapStartTime = Time.time;
     }
 
     private static bool InRagdollLayer(Component body)
@@ -295,7 +321,7 @@ class Parrot : MonoBehaviour
 //        return 7.279089406e-4f * x3 - 7.467534083e-3f * x2 + 2.119913811e-2f * x + 2.330367864e-1f;
     }
 
-    private void SetRagdollEnabled(bool isEnabled)
+    private void SetRagdollEnabled(bool isEnabled, Vector3 bodyVelocity)
     {
         List<Collider> ragdollColliders = GetComponentsInChildren<Collider>()
             .Where(InRagdollLayer)
@@ -319,8 +345,11 @@ class Parrot : MonoBehaviour
         {
             body.isKinematic = !isEnabled;
             body.detectCollisions = isEnabled;
-            body.velocity = transform.TransformVector(_localVelocity);
-            body.angularVelocity = Vector3.zero;
+            if (isEnabled)
+            {
+                body.velocity = bodyVelocity;
+                body.angularVelocity = Vector3.zero;
+            }
         }
 
         // Disable kinematic scripts (let physics take control)
@@ -332,9 +361,10 @@ class Parrot : MonoBehaviour
 
     private void UpdateAirflowAudioByVelocity(Vector3 newLocalVelocity)
     {
-        float audioLerpBySpeed = Mathf.InverseLerp(0, 15, newLocalVelocity.magnitude);
-        _audioAirflow.volume = audioLerpBySpeed;
-        _audioAirflow.pitch = Mathf.Lerp(0.5f, 2f, audioLerpBySpeed);
+        float volumeLerp = Mathf.InverseLerp(0, 15, newLocalVelocity.magnitude);
+        float pitchLerp = Mathf.InverseLerp(0, 25, newLocalVelocity.magnitude);
+        _audioAirflow.volume = volumeLerp;
+        _audioAirflow.pitch = Mathf.Lerp(0.5f, 3f, pitchLerp);
     }
 
     private float Angle360ToPlusMinus180(float angleDeg)

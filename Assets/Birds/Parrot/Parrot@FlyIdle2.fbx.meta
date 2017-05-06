@@ -205,7 +205,7 @@ ModelImporter:
       curves: []
       events:
       - time: 0.49613902
-        functionName: OnAnimationFlapStart
+        functionName: FlapStart
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
