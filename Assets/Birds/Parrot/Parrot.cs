@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -96,15 +97,24 @@ class Parrot : MonoBehaviour
     /// <summary>Time when the flap animation started last time, used to apply thrust in sync with animation.</summary>
     private float _flapStartTime;
 
+    // Once on script load, after all game objects are created and can be referenced by .Find()
+    void Awake()
+    {
+    }
 
+    // On start, after Awake()
     void Start()
     {
         _animator = GetComponentInChildren<Animator>();
         _audioAirflow = GameObject.Find("AudioSourceAirflow").GetComponent<AudioSource>();
         _audioCollision = GameObject.Find("AudioSourceCollision").GetComponent<AudioSource>();
-//        _hud = GameObject.Find("HUDCanvas").GetComponent<Canvas>();
 
-//        _prevTransform = transform;
+        // Default to scene's position of the Parrot if no spawn point is found
+        var spawnPoint = GameObject.FindGameObjectsWithTag("Respawn").FirstOrDefault();
+        if (spawnPoint != null)
+            transform.SetPositionAndRotation(spawnPoint.transform.position, spawnPoint.transform.rotation);
+        else
+            Debug.LogWarning("No spawn point found.");
 
         // Start with a forward velocity
         _localVelocity = Vector3.forward * 10;

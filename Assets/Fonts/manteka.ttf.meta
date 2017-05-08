@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 04dc927219764f1438d52b75e6699142
+timeCreated: 1494273860
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Manteka
+  fontNames:
+  - Manteka
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
