@@ -1,6 +1,8 @@
-using System;
 using UnityEditor;
 using UnityEngine;
+
+// ReSharper disable InconsistentNaming
+// ReSharper disable ArrangeTypeMemberModifiers, ArrangeTypeModifiers, FieldCanBeMadeReadOnly.Global, ConvertToConstant.Global, CheckNamespace, MemberCanBePrivate.Global, UnassignedField.Global, UnusedMember.Local, UnusedMember.Global
 
 namespace UnityStandardAssets.ImageEffects
 {
@@ -20,8 +22,8 @@ namespace UnityStandardAssets.ImageEffects
         SerializedProperty velocityScale;
         SerializedProperty velocityDownsample;
         SerializedProperty noiseTexture;
-        SerializedProperty showVelocity;
-        SerializedProperty showVelocityScale;
+//        SerializedProperty showVelocity;
+//        SerializedProperty showVelocityScale;
         SerializedProperty excludeLayers;
 
         void OnEnable () {
@@ -55,7 +57,7 @@ namespace UnityStandardAssets.ImageEffects
             EditorGUILayout.LabelField("Simulates camera based motion blur", EditorStyles.miniLabel);
 
             EditorGUILayout.PropertyField (filterType, new GUIContent("Technique"));
-            if (filterType.enumValueIndex == 3 && !(target as CameraMotionBlur).Dx11Support()) {
+            if (filterType.enumValueIndex == 3 && !((CameraMotionBlur) target).Dx11Support()) {
                 EditorGUILayout.HelpBox("DX11 mode not supported (need shader model 5)", MessageType.Info);
             }
             EditorGUILayout.PropertyField (velocityScale, new GUIContent(" Velocity Scale"));

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 // This class implements simple ghosting type Motion Blur.
@@ -19,15 +18,10 @@ namespace UnityStandardAssets.ImageEffects
 
         private RenderTexture accumTexture;
 
-        override protected void Start()
-        {
-            if (!SystemInfo.supportsRenderTextures)
-            {
-                enabled = false;
-                return;
-            }
-            base.Start();
-        }
+//        override protected void Start()
+//        {
+//            base.Start();
+//        }
 
         override protected void OnDisable()
         {

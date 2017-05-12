@@ -11,6 +11,8 @@ enum UpDirection
 [AddComponentMenu("Camera-Control/LookAt")]
 class LookAt : MonoBehaviour
 {
+    // Disable warning: field never assigned
+#pragma warning disable 649
     /// <summary>Offset relative to <see cref="Target" /> to look at.</summary>
     public Vector3 Offset;
 
@@ -19,6 +21,7 @@ class LookAt : MonoBehaviour
 
     /// <summary>What up direction to use when looking at target.</summary>
     public UpDirection UpDirection;
+#pragma warning restore 649
 
     void Start()
     {

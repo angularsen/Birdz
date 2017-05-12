@@ -6,6 +6,8 @@ using UnityEngine;
 [AddComponentMenu("Camera-Control/FollowCam")]
 class FollowCam : MonoBehaviour
 {
+    // Disable warning: public field never assigned
+#pragma warning disable 649
     // Distance behind the target
     public float Distance = 1.0f;
 
@@ -26,6 +28,9 @@ class FollowCam : MonoBehaviour
 
     /// <summary>Target to follow and look in relation to.</summary>
     public Transform Target;
+
+    // Disable warning: public field never assigned
+#pragma warning restore 649
 
     private Vector3 _prevTargetPosition;
     private float _prevTargetTime;
