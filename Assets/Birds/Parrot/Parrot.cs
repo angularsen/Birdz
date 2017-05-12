@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 // ReSharper disable ArrangeTypeMemberModifiers, ArrangeTypeModifiers, FieldCanBeMadeReadOnly.Global, ConvertToConstant.Global, CheckNamespace, MemberCanBePrivate.Global, UnassignedField.Global, UnusedMember.Local, UnusedMember.Global
 
@@ -33,6 +32,7 @@ static class AnimatorParams
     internal const string FlapSpeedMultiplier = "FlapSpeedMultiplier";
     internal const string Speed = "Speed m:s";
     internal const string ThrustInput = "ThrustInput";
+    public const string Grounded = "Grounded";
 }
 
 static class Tags
@@ -41,6 +41,14 @@ static class Tags
     internal const string MainCamera = "MainCamera";
     internal const string Player = "Player";
     public const string Finish = "Finish";
+}
+
+enum BirdState
+{
+    Flying,
+    Landing,
+    Grounded,
+    TakeOff
 }
 
 // Place the script in the Camera-Control group in the component menu
@@ -97,6 +105,8 @@ class Parrot : MonoBehaviour
     /// <summary>Time when the flap animation started last time, used to apply thrust in sync with animation.</summary>
     private float _flapStartTime;
 
+    private BirdState _state;
+
     // Once on script load, after all game objects are created and can be referenced by .Find()
     void Awake()
     {
@@ -105,7 +115,9 @@ class Parrot : MonoBehaviour
     // On start, after Awake()
     void Start()
     {
+        _state = BirdState.Flying;
         _animator = GetComponentInChildren<Animator>();
+
         _audioAirflow = GameObject.Find("AudioSourceAirflow").GetComponent<AudioSource>();
         _audioCollision = GameObject.Find("AudioSourceCollision").GetComponent<AudioSource>();
 
@@ -145,12 +157,29 @@ class Parrot : MonoBehaviour
     {
         if (!IsKinematic) return;
 
+        switch (_state)
+        {
+            case BirdState.Grounded:
+                HandleGrounded();
+                break;
+            case BirdState.Flying:
+            case BirdState.Landing:
+            case BirdState.TakeOff:
+                HandleFlying();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private void HandleFlying()
+    {
         float dt = Time.fixedDeltaTime;
         float timeSinceFlapStart = Time.time - _flapStartTime;
 
         // Only apply thrust during the downwards flap motion (0.5s time window from start of downwards flap animation)
         float thrustInput = Input.GetAxis(InputNames.Thrust);
-        
+
         float thrustInputWhenFlapping = thrustInput * Gaussian(timeSinceFlapStart, 0.1f, 0.01f);
         float thrustForce = (thrustInputWhenFlapping) * MaxThrustN;
         float brakeForce = Input.GetAxis(InputNames.Brake) * MaxBrakeN;
@@ -211,6 +240,7 @@ class Parrot : MonoBehaviour
 
         // Update audio parameters
         UpdateAirflowAudioByVelocity(newLocalVelocity);
+        _localVelocity = newLocalVelocity;
 
         var i = 0;
         DebugLabels[i++] = string.Format("Accel[{0}={1} m/s²]", totalLocalAccel, totalLocalAccel.magnitude);
@@ -236,7 +266,25 @@ class Parrot : MonoBehaviour
 //        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(newLocalVelocity), Color.red);
 
 //        _prevTransform = prevTransform;
-        _localVelocity = newLocalVelocity;
+    }
+
+    private void HandleGrounded()
+    {
+        float thrustInput = Input.GetAxis(InputNames.Thrust);
+        if (thrustInput > 0.5f)
+        {
+            SetState(BirdState.TakeOff);
+            // Initial boost/jump
+            _localVelocity = 5f * Vector3.forward + 5f * Vector3.up;
+        }
+    }
+
+    private void SetState(BirdState state)
+    {
+        _state = state;
+
+        // TODO Use a string to expose all states to animator instead
+        _animator.SetBool(AnimatorParams.Grounded, state == BirdState.Grounded);
     }
 
     private static float Gaussian(float x, float xMax, float stdDev)
@@ -260,8 +308,10 @@ class Parrot : MonoBehaviour
     {
         if (col.name.StartsWith("Terrain "))
         {
-            // TODO Handle landing specifically
-            Crash(col);
+            if (_localVelocity.magnitude < 5)
+                Land();
+            else
+                Crash(col);
         }
         else if (col.name.StartsWith("tree"))
         {
@@ -271,6 +321,13 @@ class Parrot : MonoBehaviour
         {
             Crash(col);
         }
+    }
+
+    private void Land()
+    {
+        _animator.SetBool(AnimatorParams.Grounded, true);
+        _localVelocity = Vector3.zero;
+        Debug.Log("Landed.");
     }
 
     private void Crash(Collider col)
