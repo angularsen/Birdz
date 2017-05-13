@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -48,7 +49,8 @@ enum BirdState
     Flying,
     Landing,
     Grounded,
-    TakeOff
+    TakeOff,
+    Crashing,
 }
 
 // Place the script in the Camera-Control group in the component menu
@@ -56,6 +58,7 @@ enum BirdState
 class Parrot : MonoBehaviour
 {
     private const int LabelHeight = 20;
+    private const float FlyingAnimationHeight = 0.765f;
     private static readonly string[] DebugLabels = new string[10];
 
     private static readonly Rect[] DebugLabelRects = DebugLabels
@@ -106,6 +109,7 @@ class Parrot : MonoBehaviour
     private float _flapStartTime;
 
     private BirdState _state;
+    private bool _loadingLevel;
 
     // Once on script load, after all game objects are created and can be referenced by .Find()
     void Awake()
@@ -115,11 +119,19 @@ class Parrot : MonoBehaviour
     // On start, after Awake()
     void Start()
     {
+        if (_loadingLevel)
+        {
+            Debug.LogWarning("Skipping, level is still loading.");
+            return;
+        }
+
+        IsKinematic = true;
         _state = BirdState.Flying;
         _animator = GetComponentInChildren<Animator>();
 
-        _audioAirflow = GameObject.Find("AudioSourceAirflow").GetComponent<AudioSource>();
-        _audioCollision = GameObject.Find("AudioSourceCollision").GetComponent<AudioSource>();
+        AudioSource[] audioSources = GetComponentsInChildren<AudioSource>();
+        _audioAirflow = audioSources.First(x => x.name == "AudioSourceAirflow");
+        _audioCollision = audioSources.First(x => x.name == "AudioSourceCollision");
 
         // Default to scene's position of the Parrot if no spawn point is found
         var spawnPoint = GameObject.FindGameObjectsWithTag("Respawn").FirstOrDefault();
@@ -141,9 +153,7 @@ class Parrot : MonoBehaviour
         // TODO Move me to a game manager object instead
         if (Input.GetButtonDown(InputNames.Reset))
         {
-            Debug.Log("Reset game.");
-            IsKinematic = true;
-            SceneManager.LoadScene(0);
+            ResetLevel();
         }
         else if (Input.GetButtonDown(InputNames.Menu))
         {
@@ -155,6 +165,7 @@ class Parrot : MonoBehaviour
 
     void FixedUpdate()
     {
+        // TODO Replace this with BirdState.Crashing?
         if (!IsKinematic) return;
 
         switch (_state)
@@ -166,6 +177,9 @@ class Parrot : MonoBehaviour
             case BirdState.Landing:
             case BirdState.TakeOff:
                 HandleFlying();
+                break;
+            case BirdState.Crashing:
+                // Let physics do its thing
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -276,6 +290,11 @@ class Parrot : MonoBehaviour
             SetState(BirdState.TakeOff);
             // Initial boost/jump
             _localVelocity = 5f * Vector3.forward + 5f * Vector3.up;
+            transform.position += _localVelocity * 0.2f;
+
+            // Landing animation has a vertical offset relative to flying animations
+            Transform model = transform.Find("ParrotModel");
+            model.localPosition = new Vector3(0, -FlyingAnimationHeight, 0);
         }
     }
 
@@ -304,8 +323,20 @@ class Parrot : MonoBehaviour
         }
     }
 
+    void OnTriggerExit(Collider col)
+    {
+        Debug.Log("Trigger exit: " + col.name);
+        if (_state == BirdState.TakeOff)
+        {
+            SetState(BirdState.Flying);
+        }
+    }
+
     void OnTriggerEnter(Collider col)
     {
+        if (_state == BirdState.TakeOff)
+            return;
+
         if (col.name.StartsWith("Terrain "))
         {
             if (_localVelocity.magnitude < 5)
@@ -325,9 +356,17 @@ class Parrot : MonoBehaviour
 
     private void Land()
     {
-        _animator.SetBool(AnimatorParams.Grounded, true);
-        _localVelocity = Vector3.zero;
         Debug.Log("Landed.");
+        SetState(BirdState.Grounded);
+        _localVelocity = Vector3.zero;
+        _animator.SetFloat(AnimatorParams.Speed, 0);
+        UpdateAirflowAudioByVelocity(Vector3.zero);
+
+        // Model has a transform to offset during flying animation, remove this offset for the standing animation
+        transform.Find("ParrotModel").localPosition = Vector3.zero;
+
+        // Rotate back to upright position
+        transform.rotation = Quaternion.FromToRotation(transform.up, Vector3.up) * transform.rotation;
     }
 
     private void Crash(Collider col)
@@ -344,6 +383,7 @@ class Parrot : MonoBehaviour
 
         _localVelocity = Vector3.zero;
         UpdateAirflowAudioByVelocity(Vector3.zero);
+        SetState(BirdState.Crashing);
     }
 
     // Called by ParrotModel->AnimationSoundPlayer via SendMessageUpwards()
@@ -447,5 +487,20 @@ class Parrot : MonoBehaviour
     private float Angle360ToPlusMinus180(float angleDeg)
     {
         return angleDeg > 180 ? angleDeg - 360 : angleDeg;
+    }
+
+    private void ResetLevel()
+    {
+        Debug.Log("Reset game.");
+        StartCoroutine(ResetLevelCoroutine());
+    }
+
+    private static IEnumerator ResetLevelCoroutine()
+    {
+        SceneManager.LoadScene("nature", LoadSceneMode.Single);
+        Debug.Log("Nature loaded: " + SceneManager.GetSceneByName("nature").isLoaded);
+        SceneManager.LoadScene("LandWithinCircle", LoadSceneMode.Additive);
+        Debug.Log("LandWithinCircle loaded: " + SceneManager.GetSceneByName("LandWithinCircle").isLoaded);
+        yield return new WaitForEndOfFrame();
     }
 }
