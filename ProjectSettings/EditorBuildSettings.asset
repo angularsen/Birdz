@@ -11,3 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/nature.unity
     guid: 63abde7dff56dba4bb1788780634da57
+  - enabled: 1
+    path: Assets/Scenes/LandWithinCircle.unity
+    guid: 6971b743866c7c34f9bcca1d31ae0aea
+  - enabled: 0
+    path: Assets/Scenes/RaceToFinish.unity
+    guid: 4c35bd01243eae1408c006c833d86368
