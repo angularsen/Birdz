@@ -109,7 +109,6 @@ class Parrot : MonoBehaviour
     private float _flapStartTime;
 
     private BirdState _state;
-    private bool _loadingLevel;
 
     // Once on script load, after all game objects are created and can be referenced by .Find()
     void Awake()
@@ -119,12 +118,6 @@ class Parrot : MonoBehaviour
     // On start, after Awake()
     void Start()
     {
-        if (_loadingLevel)
-        {
-            Debug.LogWarning("Skipping, level is still loading.");
-            return;
-        }
-
         IsKinematic = true;
         _state = BirdState.Flying;
         _animator = GetComponentInChildren<Animator>();
