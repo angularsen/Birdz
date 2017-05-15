@@ -17,6 +17,7 @@ public class LandOnFinish : MonoBehaviour
     private Parrot _playerScript;
     private float _startTime;
     private Text _timeText;
+    private AudioSource _cheerAudio;
 
     // Use this for initialization
     void Start()
@@ -27,6 +28,7 @@ public class LandOnFinish : MonoBehaviour
         _startTime = Time.time;
         _playerBird = GameObject.FindGameObjectsWithTag("Player").Single();
         _playerScript = _playerBird.GetComponent<Parrot>();
+        _cheerAudio = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -36,7 +38,10 @@ public class LandOnFinish : MonoBehaviour
             _timeText.text = string.Format("Time: {0:0.0} s", Time.time - _startTime);
 
         if (_isBirdInLandingZone && _playerScript.GetState() == BirdState.Grounded)
+        {
             _finishedText.enabled = true;
+            _cheerAudio.Play();
+        }
     }
 
     void OnTriggerEnter(Collider col)
