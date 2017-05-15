@@ -41,6 +41,7 @@ static class Tags
     internal const string Untagged = "Untagged";
     internal const string MainCamera = "MainCamera";
     internal const string Player = "Player";
+    public const string PlayerCollider = "PlayerCollider";
     public const string Finish = "Finish";
 }
 
@@ -55,7 +56,7 @@ enum BirdState
 
 // Place the script in the Camera-Control group in the component menu
 [AddComponentMenu("Birds/Parrot/Script")]
-class Parrot : MonoBehaviour
+public class Parrot : MonoBehaviour
 {
     private const int LabelHeight = 20;
     private const float FlyingAnimationHeight = 0.765f;
@@ -284,10 +285,6 @@ class Parrot : MonoBehaviour
             // Initial boost/jump
             _localVelocity = 5f * Vector3.forward + 5f * Vector3.up;
             transform.position += _localVelocity * 0.2f;
-
-            // Landing animation has a vertical offset relative to flying animations
-            Transform model = transform.Find("ParrotModel");
-            model.localPosition = new Vector3(0, -FlyingAnimationHeight, 0);
         }
     }
 
@@ -327,10 +324,11 @@ class Parrot : MonoBehaviour
 
     void OnTriggerEnter(Collider col)
     {
+        Debug.Log("Trigger enter: " + col.name);
         if (_state == BirdState.TakeOff)
             return;
 
-        if (col.name.StartsWith("Terrain "))
+        if (col.name.StartsWith("Terrain ") || col.tag == Tags.Finish)
         {
             if (_localVelocity.magnitude < 5)
                 Land();
@@ -338,10 +336,6 @@ class Parrot : MonoBehaviour
                 Crash(col);
         }
         else if (col.name.StartsWith("tree"))
-        {
-            Crash(col);
-        }
-        else if (col.tag == Tags.Finish)
         {
             Crash(col);
         }
@@ -354,9 +348,6 @@ class Parrot : MonoBehaviour
         _localVelocity = Vector3.zero;
         _animator.SetFloat(AnimatorParams.Speed, 0);
         UpdateAirflowAudioByVelocity(Vector3.zero);
-
-        // Model has a transform to offset during flying animation, remove this offset for the standing animation
-        transform.Find("ParrotModel").localPosition = Vector3.zero;
 
         // Rotate back to upright position
         transform.rotation = Quaternion.FromToRotation(transform.up, Vector3.up) * transform.rotation;
@@ -382,8 +373,13 @@ class Parrot : MonoBehaviour
     // Called by ParrotModel->AnimationSoundPlayer via SendMessageUpwards()
     void OnAnimationFlapStart()
     {
-        Debug.Log("SendMessageUpwards RECEIVED");
+//        Debug.Log("SendMessageUpwards RECEIVED");
         _flapStartTime = Time.time;
+    }
+
+    internal BirdState GetState()
+    {
+        return _state;
     }
 
     private static bool InRagdollLayer(Component body)

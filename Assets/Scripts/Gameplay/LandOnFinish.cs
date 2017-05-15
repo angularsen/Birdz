@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using UnityEngine.UI;
 
 // ReSharper disable ArrangeTypeMemberModifiers, ArrangeTypeModifiers, FieldCanBeMadeReadOnly.Global, ConvertToConstant.Global, CheckNamespace, MemberCanBePrivate.Global, UnassignedField.Global, UnusedMember.Local, UnusedMember.Global
@@ -8,9 +9,12 @@ using UnityEngine.UI;
 ///     Requires:
 ///     - Collider with 'Is Trigger' disabled and no rigid body attached
 /// </summary>
-public class RaceFinish : MonoBehaviour
+public class LandOnFinish : MonoBehaviour
 {
     private Text _finishedText;
+    private bool _isBirdInLandingZone;
+    private GameObject _playerBird;
+    private Parrot _playerScript;
     private float _startTime;
     private Text _timeText;
 
@@ -21,6 +25,8 @@ public class RaceFinish : MonoBehaviour
         _timeText = GameObject.Find("TimeText").GetComponent<Text>();
         _finishedText.enabled = false;
         _startTime = Time.time;
+        _playerBird = GameObject.FindGameObjectsWithTag("Player").Single();
+        _playerScript = _playerBird.GetComponent<Parrot>();
     }
 
     // Update is called once per frame
@@ -28,11 +34,26 @@ public class RaceFinish : MonoBehaviour
     {
         if (!_finishedText.enabled)
             _timeText.text = string.Format("Time: {0:0.0} s", Time.time - _startTime);
+
+        if (_isBirdInLandingZone && _playerScript.GetState() == BirdState.Grounded)
+            _finishedText.enabled = true;
     }
 
     void OnTriggerEnter(Collider col)
     {
         if (col.tag == Tags.PlayerCollider)
-            _finishedText.enabled = true;
+        {
+            Debug.Log("Player entered landing zone.");
+            _isBirdInLandingZone = true;
+        }
+    }
+
+    void OnTriggerExit(Collider col)
+    {
+        if (col.tag == Tags.PlayerCollider)
+        {
+            Debug.Log("Player left landing zone.");
+            _isBirdInLandingZone = false;
+        }
     }
 }

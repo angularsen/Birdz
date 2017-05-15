@@ -1302,7 +1302,7 @@ Light:
   serializedVersion: 8
   m_Type: 1
   m_Color: {r: 0.9338235, g: 0.830781, b: 0.7003676, a: 1}
-  m_Intensity: 4.27
+  m_Intensity: 2
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 1
@@ -1335,7 +1335,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 95618120}
   m_LocalRotation: {x: 0.3753272, y: -0.14901125, z: -0.43337968, w: 0.80567193}
-  m_LocalPosition: {x: 171.6, y: 3.1, z: -4.6}
+  m_LocalPosition: {x: 171.6, y: 9.36, z: -4.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -14542,7 +14542,7 @@ GameObject:
   - component: {fileID: 1159291371}
   m_Layer: 8
   m_Name: MainCollider
-  m_TagString: Player
+  m_TagString: PlayerCollider
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

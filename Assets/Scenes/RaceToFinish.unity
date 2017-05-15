@@ -223,7 +223,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1031840517}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Spawn
   m_TagString: Respawn
   m_Icon: {fileID: 5721338939258241955, guid: 0000000000000000d000000000000000, type: 0}
@@ -328,7 +328,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: -2068598484
+  randomSeed: 1988427855
   InitialModule:
     serializedVersion: 3
     enabled: 1

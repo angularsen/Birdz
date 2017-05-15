@@ -20,7 +20,7 @@ public class ParrotAnimationEventReceiver : MonoBehaviour
     void FlapStart()
     {
         _audioFlap.Play();
-        Debug.Log("SendMessageUpwards");
+//        Debug.Log("SendMessageUpwards");
         SendMessageUpwards("OnAnimationFlapStart");
     }
 }
