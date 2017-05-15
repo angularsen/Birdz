@@ -2,25 +2,19 @@
 
 // ReSharper disable ArrangeTypeMemberModifiers, ArrangeTypeModifiers, FieldCanBeMadeReadOnly.Global, ConvertToConstant.Global, CheckNamespace, MemberCanBePrivate.Global, UnassignedField.Global, UnusedMember.Local, UnusedMember.Global
 
-public class ParrotAnimationEventReceiver : MonoBehaviour
+public class Bobbing : MonoBehaviour
 {
-    private AudioSource _audioFlap;
+    private Vector3 _startPos;
 
     // Use this for initialization
     void Start()
     {
-        _audioFlap = GameObject.Find("AudioSourceFlap").GetComponent<AudioSource>();
+        _startPos = transform.position;
     }
 
     // Update is called once per frame
     void Update()
     {
-    }
-
-    void FlapStart()
-    {
-        _audioFlap.Play();
-//        Debug.Log("SendMessageUpwards");
-        SendMessageUpwards("OnAnimationFlapStart");
+        transform.position = _startPos + new Vector3(0, .5f * Mathf.Sin(Time.time * 6.28f), 0);
     }
 }

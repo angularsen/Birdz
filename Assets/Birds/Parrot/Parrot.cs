@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 // ReSharper disable ArrangeTypeMemberModifiers, ArrangeTypeModifiers, FieldCanBeMadeReadOnly.Global, ConvertToConstant.Global, CheckNamespace, MemberCanBePrivate.Global, UnassignedField.Global, UnusedMember.Local, UnusedMember.Global
 
@@ -32,6 +33,7 @@ static class AnimatorParams
     internal const string FlapSpeedMultiplier = "FlapSpeedMultiplier";
     internal const string Speed = "Speed m:s";
     internal const string ThrustInput = "ThrustInput";
+    public const string Grounded = "Grounded";
 }
 
 static class Tags
@@ -39,14 +41,25 @@ static class Tags
     internal const string Untagged = "Untagged";
     internal const string MainCamera = "MainCamera";
     internal const string Player = "Player";
+    public const string PlayerCollider = "PlayerCollider";
     public const string Finish = "Finish";
+}
+
+enum BirdState
+{
+    Flying,
+    Landing,
+    Grounded,
+    TakeOff,
+    Crashing,
 }
 
 // Place the script in the Camera-Control group in the component menu
 [AddComponentMenu("Birds/Parrot/Script")]
-class Parrot : MonoBehaviour
+public class Parrot : MonoBehaviour
 {
     private const int LabelHeight = 20;
+    private const float FlyingAnimationHeight = 0.765f;
     private static readonly string[] DebugLabels = new string[10];
 
     private static readonly Rect[] DebugLabelRects = DebugLabels
@@ -96,15 +109,30 @@ class Parrot : MonoBehaviour
     /// <summary>Time when the flap animation started last time, used to apply thrust in sync with animation.</summary>
     private float _flapStartTime;
 
+    private BirdState _state;
 
+    // Once on script load, after all game objects are created and can be referenced by .Find()
+    void Awake()
+    {
+    }
+
+    // On start, after Awake()
     void Start()
     {
+        IsKinematic = true;
+        _state = BirdState.Flying;
         _animator = GetComponentInChildren<Animator>();
-        _audioAirflow = GameObject.Find("AudioSourceAirflow").GetComponent<AudioSource>();
-        _audioCollision = GameObject.Find("AudioSourceCollision").GetComponent<AudioSource>();
-//        _hud = GameObject.Find("HUDCanvas").GetComponent<Canvas>();
 
-//        _prevTransform = transform;
+        AudioSource[] audioSources = GetComponentsInChildren<AudioSource>();
+        _audioAirflow = audioSources.First(x => x.name == "AudioSourceAirflow");
+        _audioCollision = audioSources.First(x => x.name == "AudioSourceCollision");
+
+        // Default to scene's position of the Parrot if no spawn point is found
+        var spawnPoint = GameObject.FindGameObjectsWithTag("Respawn").FirstOrDefault();
+        if (spawnPoint != null)
+            transform.SetPositionAndRotation(spawnPoint.transform.position, spawnPoint.transform.rotation);
+        else
+            Debug.LogWarning("No spawn point found.");
 
         // Start with a forward velocity
         _localVelocity = Vector3.forward * 10;
@@ -119,9 +147,7 @@ class Parrot : MonoBehaviour
         // TODO Move me to a game manager object instead
         if (Input.GetButtonDown(InputNames.Reset))
         {
-            Debug.Log("Reset game.");
-            IsKinematic = true;
-            SceneManager.LoadScene(0);
+            ResetLevel();
         }
         else if (Input.GetButtonDown(InputNames.Menu))
         {
@@ -133,14 +159,35 @@ class Parrot : MonoBehaviour
 
     void FixedUpdate()
     {
+        // TODO Replace this with BirdState.Crashing?
         if (!IsKinematic) return;
 
+        switch (_state)
+        {
+            case BirdState.Grounded:
+                HandleGrounded();
+                break;
+            case BirdState.Flying:
+            case BirdState.Landing:
+            case BirdState.TakeOff:
+                HandleFlying();
+                break;
+            case BirdState.Crashing:
+                // Let physics do its thing
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private void HandleFlying()
+    {
         float dt = Time.fixedDeltaTime;
         float timeSinceFlapStart = Time.time - _flapStartTime;
 
         // Only apply thrust during the downwards flap motion (0.5s time window from start of downwards flap animation)
         float thrustInput = Input.GetAxis(InputNames.Thrust);
-        
+
         float thrustInputWhenFlapping = thrustInput * Gaussian(timeSinceFlapStart, 0.1f, 0.01f);
         float thrustForce = (thrustInputWhenFlapping) * MaxThrustN;
         float brakeForce = Input.GetAxis(InputNames.Brake) * MaxBrakeN;
@@ -201,6 +248,7 @@ class Parrot : MonoBehaviour
 
         // Update audio parameters
         UpdateAirflowAudioByVelocity(newLocalVelocity);
+        _localVelocity = newLocalVelocity;
 
         var i = 0;
         DebugLabels[i++] = string.Format("Accel[{0}={1} m/s²]", totalLocalAccel, totalLocalAccel.magnitude);
@@ -226,7 +274,26 @@ class Parrot : MonoBehaviour
 //        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(newLocalVelocity), Color.red);
 
 //        _prevTransform = prevTransform;
-        _localVelocity = newLocalVelocity;
+    }
+
+    private void HandleGrounded()
+    {
+        float thrustInput = Input.GetAxis(InputNames.Thrust);
+        if (thrustInput > 0.5f)
+        {
+            SetState(BirdState.TakeOff);
+            // Initial boost/jump
+            _localVelocity = 5f * Vector3.forward + 5f * Vector3.up;
+            transform.position += _localVelocity * 0.2f;
+        }
+    }
+
+    private void SetState(BirdState state)
+    {
+        _state = state;
+
+        // TODO Use a string to expose all states to animator instead
+        _animator.SetBool(AnimatorParams.Grounded, state == BirdState.Grounded);
     }
 
     private static float Gaussian(float x, float xMax, float stdDev)
@@ -246,21 +313,44 @@ class Parrot : MonoBehaviour
         }
     }
 
+    void OnTriggerExit(Collider col)
+    {
+        Debug.Log("Trigger exit: " + col.name);
+        if (_state == BirdState.TakeOff)
+        {
+            SetState(BirdState.Flying);
+        }
+    }
+
     void OnTriggerEnter(Collider col)
     {
-        if (col.name.StartsWith("Terrain "))
+        Debug.Log("Trigger enter: " + col.name);
+        if (_state == BirdState.TakeOff)
+            return;
+
+        if (col.name.StartsWith("Terrain ") || col.tag == Tags.Finish)
         {
-            // TODO Handle landing specifically
-            Crash(col);
+            if (_localVelocity.magnitude < 5)
+                Land();
+            else
+                Crash(col);
         }
         else if (col.name.StartsWith("tree"))
         {
             Crash(col);
         }
-        else if (col.tag == Tags.Finish)
-        {
-            Crash(col);
-        }
+    }
+
+    private void Land()
+    {
+        Debug.Log("Landed.");
+        SetState(BirdState.Grounded);
+        _localVelocity = Vector3.zero;
+        _animator.SetFloat(AnimatorParams.Speed, 0);
+        UpdateAirflowAudioByVelocity(Vector3.zero);
+
+        // Rotate back to upright position
+        transform.rotation = Quaternion.FromToRotation(transform.up, Vector3.up) * transform.rotation;
     }
 
     private void Crash(Collider col)
@@ -277,13 +367,19 @@ class Parrot : MonoBehaviour
 
         _localVelocity = Vector3.zero;
         UpdateAirflowAudioByVelocity(Vector3.zero);
+        SetState(BirdState.Crashing);
     }
 
     // Called by ParrotModel->AnimationSoundPlayer via SendMessageUpwards()
     void OnAnimationFlapStart()
     {
-        Debug.Log("SendMessageUpwards RECEIVED");
+//        Debug.Log("SendMessageUpwards RECEIVED");
         _flapStartTime = Time.time;
+    }
+
+    internal BirdState GetState()
+    {
+        return _state;
     }
 
     private static bool InRagdollLayer(Component body)
@@ -380,5 +476,20 @@ class Parrot : MonoBehaviour
     private float Angle360ToPlusMinus180(float angleDeg)
     {
         return angleDeg > 180 ? angleDeg - 360 : angleDeg;
+    }
+
+    private void ResetLevel()
+    {
+        Debug.Log("Reset game.");
+        StartCoroutine(ResetLevelCoroutine());
+    }
+
+    private static IEnumerator ResetLevelCoroutine()
+    {
+        SceneManager.LoadScene("nature", LoadSceneMode.Single);
+        Debug.Log("Nature loaded: " + SceneManager.GetSceneByName("nature").isLoaded);
+        SceneManager.LoadScene("LandWithinCircle", LoadSceneMode.Additive);
+        Debug.Log("LandWithinCircle loaded: " + SceneManager.GetSceneByName("LandWithinCircle").isLoaded);
+        yield return new WaitForEndOfFrame();
     }
 }

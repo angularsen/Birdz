@@ -14,9 +14,9 @@ namespace UnityStandardAssets.Cameras
         // Whether the rig should automatically target the player.
         [SerializeField] private readonly bool _autoTargetPlayer = true;
 
-        [SerializeField] protected Transform _target; // The target object to follow
+        [SerializeField] protected Transform _target = null; // The target object to follow
         [SerializeField] protected Vector3 _targetOffset = Vector3.zero; // The offset relative to target to look at
-        [SerializeField] private UpdateType _updateType; // stores the selected update type
+        [SerializeField] private UpdateType _updateType = UpdateType.FixedUpdate; // stores the selected update type
 
         protected Rigidbody TargetRigidbody;
 

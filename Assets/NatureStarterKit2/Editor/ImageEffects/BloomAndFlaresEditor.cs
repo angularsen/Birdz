@@ -75,9 +75,9 @@ namespace UnityStandardAssets.ImageEffects
             EditorGUILayout.PropertyField (hdr, new GUIContent("HDR"));
 
             // display info text when screen blend mode cannot be used
-            Camera cam = (target as BloomAndFlares).GetComponent<Camera>();
+            Camera cam = ((BloomAndFlares) target).GetComponent<Camera>();
             if (cam != null) {
-                if (screenBlendMode.enumValueIndex==0 && ((cam.hdr && hdr.enumValueIndex==0) || (hdr.enumValueIndex==1))) {
+                if (screenBlendMode.enumValueIndex==0 && ((cam.allowHDR && hdr.enumValueIndex==0) || (hdr.enumValueIndex==1))) {
                     EditorGUILayout.HelpBox("Screen blend is not supported in HDR. Using 'Add' instead.", MessageType.Info);
                 }
             }
