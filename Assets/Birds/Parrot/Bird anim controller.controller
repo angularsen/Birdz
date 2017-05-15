@@ -197,7 +197,7 @@ AnimatorState:
   m_SpeedParameterActive: 1
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 887c45bfa2090974aa5613f54c598129, type: 3}
+  m_Motion: {fileID: 7400000, guid: 278c9658537aee04b9e17f1fef1aa252, type: 3}
   m_Tag: 
   m_SpeedParameter: FlapSpeedMultiplier
   m_MirrorParameter: 
@@ -246,7 +246,7 @@ AnimatorState:
   m_SpeedParameterActive: 0
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 80dd18dd54878d0458555cc0ae537124, type: 3}
+  m_Motion: {fileID: 7400000, guid: 67d9b66166cd3c84588077b7a4769521, type: 3}
   m_Tag: 
   m_SpeedParameter: Blend
   m_MirrorParameter: 
