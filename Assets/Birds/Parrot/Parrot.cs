@@ -219,9 +219,7 @@ public class Parrot : MonoBehaviour
         transform.position += worldDisplacement;
         transform.Rotate(rotationInputEuler, Space.Self);
 
-        Vector3 localVelocityKmh = newLocalVelocity * 3.6f;
         float newFwdSpeed = newLocalVelocity.z;
-        float forwardSpeedKmh = newFwdSpeed * 3.6f;
 
         // Update animator parameters
         _animator.SetFloat(AnimatorParams.Speed, newFwdSpeed);
@@ -232,29 +230,34 @@ public class Parrot : MonoBehaviour
         UpdateAirflowAudioByVelocity(newLocalVelocity);
         _localVelocity = newLocalVelocity;
 
-        var i = 0;
-        DebugLabels[i++] = string.Format("Accel[{0}={1} m/s²]", totalLocalAccel, totalLocalAccel.magnitude);
-        DebugLabels[i++] = string.Format("Speed[{0}={1} km/h], F.Speed[{2} km/h]", localVelocityKmh,
-            localVelocityKmh.magnitude,
-            forwardSpeedKmh);
-        DebugLabels[i++] = string.Format("Angle of attack [{0}]", prevAngleOfAttackDeg);
-//        _debugLabels[i++] = string.Format("Drag[{0}={1}]", dragForce, dragForce.magnitude);
-//        DebugLabels[i++] = string.Format("Slip[{0}={1}]", slipForce, slipForce);
-        DebugLabels[i++] = string.Format("Pitch[{0:0}], Roll[{1:0}], Heading[{2:0}]",
-            Angle360ToPlusMinus180(transform.eulerAngles.x),
-            Angle360ToPlusMinus180(transform.eulerAngles.z),
-            Angle360ToPlusMinus180(transform.eulerAngles.y));
+        #region Debug graphics
+//        Vector3 localVelocityKmh = newLocalVelocity * 3.6f;
+//        float forwardSpeedKmh = newFwdSpeed * 3.6f;
 
-//        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localBodyDrag), Color.green);
-//        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localLiftInducedDrag), Color.gray);
-//        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localDrag), Color.yellow);
+//                    var i = 0;
+//            DebugLabels[i++] = string.Format("Accel[{0}={1} m/s²]", totalLocalAccel, totalLocalAccel.magnitude);
+//            DebugLabels[i++] = string.Format("Speed[{0}={1} km/h], F.Speed[{2} km/h]", localVelocityKmh,
+//                localVelocityKmh.magnitude,
+//                forwardSpeedKmh);
+//            DebugLabels[i++] = string.Format("Angle of attack [{0}]", prevAngleOfAttackDeg);
+////        _debugLabels[i++] = string.Format("Drag[{0}={1}]", dragForce, dragForce.magnitude);
+////        DebugLabels[i++] = string.Format("Slip[{0}={1}]", slipForce, slipForce);
+//            DebugLabels[i++] = string.Format("Pitch[{0:0}], Roll[{1:0}], Heading[{2:0}]",
+//                Angle360ToPlusMinus180(transform.eulerAngles.x),
+//                Angle360ToPlusMinus180(transform.eulerAngles.z),
+//                Angle360ToPlusMinus180(transform.eulerAngles.y));
 //
-//        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localLift), Color.blue);
-//        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localThrust), Color.cyan);
-//
-//        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(totalLocalAccel), Color.magenta);
-//        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(newLocalVelocity), Color.red);
+////        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localBodyDrag), Color.green);
+////        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localLiftInducedDrag), Color.gray);
+////        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localDrag), Color.yellow);
+////
+////        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localLift), Color.blue);
+////        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localThrust), Color.cyan);
+////
+////        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(totalLocalAccel), Color.magenta);
+////        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(newLocalVelocity), Color.red);
 
+        #endregion
 //        _prevTransform = prevTransform;
     }
 
