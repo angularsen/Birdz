@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections;
+﻿// ReSharper disable ArrangeTypeMemberModifiers, ArrangeTypeModifiers, FieldCanBeMadeReadOnly.Global, ConvertToConstant.Global, CheckNamespace, MemberCanBePrivate.Global, UnassignedField.Global, UnusedMember.Local, UnusedMember.Global
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-
-// ReSharper disable ArrangeTypeMemberModifiers, ArrangeTypeModifiers, FieldCanBeMadeReadOnly.Global, ConvertToConstant.Global, CheckNamespace, MemberCanBePrivate.Global, UnassignedField.Global, UnusedMember.Local, UnusedMember.Global
 
 enum Layers
 {
@@ -43,6 +41,7 @@ static class Tags
     internal const string Player = "Player";
     public const string PlayerCollider = "PlayerCollider";
     public const string Finish = "Finish";
+    public const string Respawn = "Respawn";
 }
 
 enum BirdState
@@ -127,12 +126,6 @@ public class Parrot : MonoBehaviour
         _audioAirflow = audioSources.First(x => x.name == "AudioSourceAirflow");
         _audioCollision = audioSources.First(x => x.name == "AudioSourceCollision");
 
-        // Default to scene's position of the Parrot if no spawn point is found
-        var spawnPoint = GameObject.FindGameObjectsWithTag("Respawn").FirstOrDefault();
-        if (spawnPoint != null)
-            transform.SetPositionAndRotation(spawnPoint.transform.position, spawnPoint.transform.rotation);
-        else
-            Debug.LogWarning("No spawn point found.");
 
         // Start with a forward velocity
         _localVelocity = Vector3.forward * 10;
@@ -144,17 +137,6 @@ public class Parrot : MonoBehaviour
 
     void Update()
     {
-        // TODO Move me to a game manager object instead
-        if (Input.GetButtonDown(InputNames.Reset))
-        {
-            ResetLevel();
-        }
-        else if (Input.GetButtonDown(InputNames.Menu))
-        {
-            // TODO Menu with exit option
-            Debug.Log("Quitting application.");
-            Application.Quit();
-        }
     }
 
     void FixedUpdate()
@@ -476,20 +458,5 @@ public class Parrot : MonoBehaviour
     private float Angle360ToPlusMinus180(float angleDeg)
     {
         return angleDeg > 180 ? angleDeg - 360 : angleDeg;
-    }
-
-    private void ResetLevel()
-    {
-        Debug.Log("Reset game.");
-        StartCoroutine(ResetLevelCoroutine());
-    }
-
-    private static IEnumerator ResetLevelCoroutine()
-    {
-        SceneManager.LoadScene("nature", LoadSceneMode.Single);
-        Debug.Log("Nature loaded: " + SceneManager.GetSceneByName("nature").isLoaded);
-        SceneManager.LoadScene("LandWithinCircle", LoadSceneMode.Additive);
-        Debug.Log("LandWithinCircle loaded: " + SceneManager.GetSceneByName("LandWithinCircle").isLoaded);
-        yield return new WaitForEndOfFrame();
     }
 }

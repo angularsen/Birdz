@@ -290,6 +290,7 @@ GameObject:
   - component: {fileID: 792503715}
   - component: {fileID: 792503714}
   - component: {fileID: 792503717}
+  - component: {fileID: 792503718}
   m_Layer: 0
   m_Name: 'Text: Land here'
   m_TagString: Untagged
@@ -374,6 +375,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3993cd6e8a29754d9f93b8c3ee21a54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &792503718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 792503713}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -900027084, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 5, y: -5}
+  m_UseGraphicAlpha: 1
 --- !u!1 &1199324445
 GameObject:
   m_ObjectHideFlags: 0
