@@ -51,6 +51,7 @@ public class MenuManager : MonoBehaviour
         {
             SceneManager.UnloadSceneAsync("MainMenu");
             _isMenuVisible = false;
+            AudioListener.pause = false;
         }
     }
 
@@ -63,6 +64,7 @@ public class MenuManager : MonoBehaviour
         // Pause time
         _timeScaleBeforePause = Time.timeScale;
         Time.timeScale = 0;
+        AudioListener.pause = true;
 
         SceneManager.LoadScene("MainMenu", LoadSceneMode.Additive);
         _isMenuVisible = true;
