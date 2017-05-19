@@ -24,6 +24,8 @@ static class InputNames
     public const string FixedCam = "FixedCam";
     public const string FreeCam = "FreeCam";
     public const string NextCam = "NextCam";
+    public const string Vertical = "Vertical";
+    public const string Horizontal = "Horizontal";
 }
 
 static class AnimatorParams
