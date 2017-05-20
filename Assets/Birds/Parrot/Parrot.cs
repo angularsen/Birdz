@@ -81,13 +81,6 @@ public class Parrot : MonoBehaviour
     public Vector3 BodyDragFactors = new Vector3(0.1f, 1f, 0.001f);
 
     public float DragCoefficient = 0.001f;
-
-    /// <summary>
-    ///     True if currently in ragdoll/physics state, such as after colliding.
-    ///     All direct manipulations of <see cref="GameObject.transform" /> will be skipped during this state.
-    /// </summary>
-    public bool IsKinematic;
-
     public float LiftCoefficient = 0.1f;
 
     public float MassKg = 1.0f;
@@ -115,6 +108,13 @@ public class Parrot : MonoBehaviour
     // Once on script load, after all game objects are created and can be referenced by .Find()
     void Awake()
     {
+        _animator = GetComponentInChildren<Animator>();
+        AudioSource[] audioSources = GetComponentsInChildren<AudioSource>();
+        _audioAirflow = audioSources.First(x => x.name == "AudioSourceAirflow");
+        _audioCollision = audioSources.First(x => x.name == "AudioSourceCollision");
+
+        // Ignore collisions between player bounding box (for collision detection) and its ragdoll colliders (for ragdoll effect)
+        Physics.IgnoreLayerCollision((int) Layers.Player, (int) Layers.PlayerRagdoll);
     }
 
     // On start, after Awake()
@@ -129,9 +129,6 @@ public class Parrot : MonoBehaviour
 
     void FixedUpdate()
     {
-        // TODO Replace this with BirdState.Crashing?
-        if (!IsKinematic) return;
-
         switch (_state)
         {
             case BirdState.Grounded:
@@ -152,21 +149,12 @@ public class Parrot : MonoBehaviour
 
     public void OnLevelLoad()
     {
-        IsKinematic = true;
-        _state = BirdState.Flying;
-        _animator = GetComponentInChildren<Animator>();
-
-        AudioSource[] audioSources = GetComponentsInChildren<AudioSource>();
-        _audioAirflow = audioSources.First(x => x.name == "AudioSourceAirflow");
-        _audioCollision = audioSources.First(x => x.name == "AudioSourceCollision");
-
+        SetState(BirdState.Flying);
 
         // Start with a forward velocity
         _localVelocity = Vector3.forward * 10;
 
-        // Ignore collisions between player bounding box (for collision detection) and its ragdoll colliders (for ragdoll effect)
-        Physics.IgnoreLayerCollision((int) Layers.Player, (int) Layers.PlayerRagdoll);
-        SetRagdollEnabled(false, transform.TransformVector(_localVelocity));
+        SetRagdollEnabled(false);
     }
 
     private void HandleFlying()
@@ -238,31 +226,31 @@ public class Parrot : MonoBehaviour
         _localVelocity = newLocalVelocity;
 
         #region Debug graphics
-//        Vector3 localVelocityKmh = newLocalVelocity * 3.6f;
-//        float forwardSpeedKmh = newFwdSpeed * 3.6f;
+        Vector3 localVelocityKmh = newLocalVelocity * 3.6f;
+        float forwardSpeedKmh = newFwdSpeed * 3.6f;
 
-//                    var i = 0;
-//            DebugLabels[i++] = string.Format("Accel[{0}={1} m/s²]", totalLocalAccel, totalLocalAccel.magnitude);
-//            DebugLabels[i++] = string.Format("Speed[{0}={1} km/h], F.Speed[{2} km/h]", localVelocityKmh,
-//                localVelocityKmh.magnitude,
-//                forwardSpeedKmh);
-//            DebugLabels[i++] = string.Format("Angle of attack [{0}]", prevAngleOfAttackDeg);
-////        _debugLabels[i++] = string.Format("Drag[{0}={1}]", dragForce, dragForce.magnitude);
-////        DebugLabels[i++] = string.Format("Slip[{0}={1}]", slipForce, slipForce);
-//            DebugLabels[i++] = string.Format("Pitch[{0:0}], Roll[{1:0}], Heading[{2:0}]",
-//                Angle360ToPlusMinus180(transform.eulerAngles.x),
-//                Angle360ToPlusMinus180(transform.eulerAngles.z),
-//                Angle360ToPlusMinus180(transform.eulerAngles.y));
+                    var i = 0;
+            DebugLabels[i++] = string.Format("Accel[{0}={1} m/s²]", totalLocalAccel, totalLocalAccel.magnitude);
+            DebugLabels[i++] = string.Format("Speed[{0}={1} km/h], F.Speed[{2} km/h]", localVelocityKmh,
+                localVelocityKmh.magnitude,
+                forwardSpeedKmh);
+            DebugLabels[i++] = string.Format("Angle of attack [{0}]", prevAngleOfAttackDeg);
+//        _debugLabels[i++] = string.Format("Drag[{0}={1}]", dragForce, dragForce.magnitude);
+//        DebugLabels[i++] = string.Format("Slip[{0}={1}]", slipForce, slipForce);
+            DebugLabels[i++] = string.Format("Pitch[{0:0}], Roll[{1:0}], Heading[{2:0}]",
+                Angle360ToPlusMinus180(transform.eulerAngles.x),
+                Angle360ToPlusMinus180(transform.eulerAngles.z),
+                Angle360ToPlusMinus180(transform.eulerAngles.y));
+
+//        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localBodyDrag), Color.green);
+//        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localLiftInducedDrag), Color.gray);
+//        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localDrag), Color.yellow);
 //
-////        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localBodyDrag), Color.green);
-////        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localLiftInducedDrag), Color.gray);
-////        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localDrag), Color.yellow);
-////
-////        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localLift), Color.blue);
-////        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localThrust), Color.cyan);
-////
-////        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(totalLocalAccel), Color.magenta);
-////        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(newLocalVelocity), Color.red);
+//        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localLift), Color.blue);
+//        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(localThrust), Color.cyan);
+//
+//        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(totalLocalAccel), Color.magenta);
+//        Debug.DrawLine(transform.position, transform.position + transform.TransformVector(newLocalVelocity), Color.red);
 
         #endregion
 //        _prevTransform = prevTransform;
@@ -282,6 +270,7 @@ public class Parrot : MonoBehaviour
 
     private void SetState(BirdState state)
     {
+        print("Parrot: SetState: " + state);
         _state = state;
 
         // TODO Use a string to expose all states to animator instead
@@ -419,7 +408,7 @@ public class Parrot : MonoBehaviour
 //        return 7.279089406e-4f * x3 - 7.467534083e-3f * x2 + 2.119913811e-2f * x + 2.330367864e-1f;
     }
 
-    private void SetRagdollEnabled(bool isEnabled, Vector3 bodyVelocity)
+    private void SetRagdollEnabled(bool isEnabled, Vector3? bodyVelocity = null)
     {
         List<Collider> ragdollColliders = GetComponentsInChildren<Collider>()
             .Where(InRagdollLayer)
@@ -445,13 +434,10 @@ public class Parrot : MonoBehaviour
             body.detectCollisions = isEnabled;
             if (isEnabled)
             {
-                body.velocity = bodyVelocity;
+                if (bodyVelocity != null) body.velocity = bodyVelocity.Value;
                 body.angularVelocity = Vector3.zero;
             }
         }
-
-        // Disable kinematic scripts (let physics take control)
-        IsKinematic = !isEnabled;
 
         // Disable animation to enable ragdoll control of limbs
         _animator.enabled = !isEnabled;
