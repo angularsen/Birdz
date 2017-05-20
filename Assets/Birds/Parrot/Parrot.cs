@@ -120,21 +120,7 @@ public class Parrot : MonoBehaviour
     // On start, after Awake()
     void Start()
     {
-        IsKinematic = true;
-        _state = BirdState.Flying;
-        _animator = GetComponentInChildren<Animator>();
-
-        AudioSource[] audioSources = GetComponentsInChildren<AudioSource>();
-        _audioAirflow = audioSources.First(x => x.name == "AudioSourceAirflow");
-        _audioCollision = audioSources.First(x => x.name == "AudioSourceCollision");
-
-
-        // Start with a forward velocity
-        _localVelocity = Vector3.forward * 10;
-
-        // Ignore collisions between player bounding box (for collision detection) and its ragdoll colliders (for ragdoll effect)
-        Physics.IgnoreLayerCollision((int) Layers.Player, (int) Layers.PlayerRagdoll);
-        SetRagdollEnabled(false, transform.TransformVector(_localVelocity));
+        OnLevelLoad();
     }
 
     void Update()
@@ -162,6 +148,25 @@ public class Parrot : MonoBehaviour
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+
+    public void OnLevelLoad()
+    {
+        IsKinematic = true;
+        _state = BirdState.Flying;
+        _animator = GetComponentInChildren<Animator>();
+
+        AudioSource[] audioSources = GetComponentsInChildren<AudioSource>();
+        _audioAirflow = audioSources.First(x => x.name == "AudioSourceAirflow");
+        _audioCollision = audioSources.First(x => x.name == "AudioSourceCollision");
+
+
+        // Start with a forward velocity
+        _localVelocity = Vector3.forward * 10;
+
+        // Ignore collisions between player bounding box (for collision detection) and its ragdoll colliders (for ragdoll effect)
+        Physics.IgnoreLayerCollision((int) Layers.Player, (int) Layers.PlayerRagdoll);
+        SetRagdollEnabled(false, transform.TransformVector(_localVelocity));
     }
 
     private void HandleFlying()
