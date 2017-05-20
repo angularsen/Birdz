@@ -154,7 +154,7 @@ ModelImporter:
     400144: //RootNode
     400146: Parrot_A01
     4300000: Parrot_A01
-    7400000: Take 001
+    7400000: StandIdle
     9500000: //RootNode
     13700000: Parrot_A01
   materials:
@@ -179,7 +179,183 @@ ModelImporter:
     animationScaleError: 0.5
     animationWrapMode: 0
     extraExposedTransformPaths: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: StandIdle
+      takeName: Take 001
+      firstFrame: 0
+      lastFrame: 200
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: NParrot
+        weight: 1
+      - path: NParrot/Bip01_Pelvis
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_L_Thigh
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_L_Thigh/Bip01_L_Calf
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_L_Thigh/Bip01_L_Calf/Bip01_L_HorseLink
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_L_Thigh/Bip01_L_Calf/Bip01_L_HorseLink/Bip01_L_Foot
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_L_Thigh/Bip01_L_Calf/Bip01_L_HorseLink/Bip01_L_Foot/Bip01_L_Toe0
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_L_Thigh/Bip01_L_Calf/Bip01_L_HorseLink/Bip01_L_Foot/Bip01_L_Toe0/Bip01_L_Toe01
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_L_Thigh/Bip01_L_Calf/Bip01_L_HorseLink/Bip01_L_Foot/Bip01_L_Toe0/Bip01_L_Toe01/Bip01_L_Toe0Nub
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_L_Thigh/Bip01_L_Calf/Bip01_L_HorseLink/Bip01_L_Foot/Bip01_L_Toe1
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_L_Thigh/Bip01_L_Calf/Bip01_L_HorseLink/Bip01_L_Foot/Bip01_L_Toe1/Bip01_L_Toe11
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_L_Thigh/Bip01_L_Calf/Bip01_L_HorseLink/Bip01_L_Foot/Bip01_L_Toe1/Bip01_L_Toe11/Bip01_L_Toe1Nub
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_L_Thigh/Bip01_L_Calf/Bip01_L_HorseLink/Bip01_L_Foot/Bip01_L_Toe2
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_L_Thigh/Bip01_L_Calf/Bip01_L_HorseLink/Bip01_L_Foot/Bip01_L_Toe2/Bip01_L_Toe21
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_L_Thigh/Bip01_L_Calf/Bip01_L_HorseLink/Bip01_L_Foot/Bip01_L_Toe2/Bip01_L_Toe21/Bip01_L_Toe2Nub
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_L_Thigh/Bip01_L_Calf/Bip01_L_HorseLink/Bip01_L_Foot/Bip01_L_Toe3
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_L_Thigh/Bip01_L_Calf/Bip01_L_HorseLink/Bip01_L_Foot/Bip01_L_Toe3/Bip01_L_Toe31
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_L_Thigh/Bip01_L_Calf/Bip01_L_HorseLink/Bip01_L_Foot/Bip01_L_Toe3/Bip01_L_Toe31/Bip01_L_Toe3Nub
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_R_Thigh
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_R_Thigh/Bip01_R_Calf
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_R_Thigh/Bip01_R_Calf/Bip01_R_HorseLink
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_R_Thigh/Bip01_R_Calf/Bip01_R_HorseLink/Bip01_R_Foot
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_R_Thigh/Bip01_R_Calf/Bip01_R_HorseLink/Bip01_R_Foot/Bip01_R_Toe0
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_R_Thigh/Bip01_R_Calf/Bip01_R_HorseLink/Bip01_R_Foot/Bip01_R_Toe0/Bip01_R_Toe01
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_R_Thigh/Bip01_R_Calf/Bip01_R_HorseLink/Bip01_R_Foot/Bip01_R_Toe0/Bip01_R_Toe01/Bip01_R_Toe0Nub
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_R_Thigh/Bip01_R_Calf/Bip01_R_HorseLink/Bip01_R_Foot/Bip01_R_Toe1
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_R_Thigh/Bip01_R_Calf/Bip01_R_HorseLink/Bip01_R_Foot/Bip01_R_Toe1/Bip01_R_Toe11
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_R_Thigh/Bip01_R_Calf/Bip01_R_HorseLink/Bip01_R_Foot/Bip01_R_Toe1/Bip01_R_Toe11/Bip01_R_Toe1Nub
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_R_Thigh/Bip01_R_Calf/Bip01_R_HorseLink/Bip01_R_Foot/Bip01_R_Toe2
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_R_Thigh/Bip01_R_Calf/Bip01_R_HorseLink/Bip01_R_Foot/Bip01_R_Toe2/Bip01_R_Toe21
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_R_Thigh/Bip01_R_Calf/Bip01_R_HorseLink/Bip01_R_Foot/Bip01_R_Toe2/Bip01_R_Toe21/Bip01_R_Toe2Nub
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_R_Thigh/Bip01_R_Calf/Bip01_R_HorseLink/Bip01_R_Foot/Bip01_R_Toe3
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_R_Thigh/Bip01_R_Calf/Bip01_R_HorseLink/Bip01_R_Foot/Bip01_R_Toe3/Bip01_R_Toe31
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_R_Thigh/Bip01_R_Calf/Bip01_R_HorseLink/Bip01_R_Foot/Bip01_R_Toe3/Bip01_R_Toe31/Bip01_R_Toe3Nub
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/Bip01_Neck
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/Bip01_Neck/Bip01_Neck1
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/Bip01_Neck/Bip01_Neck1/Bip01_Head
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/Bip01_Neck/Bip01_Neck1/Bip01_Head/Bip01_HeadNub
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/Bip01_Neck/Bip01_Neck1/Bip01_Head/BN_Eye_L_01
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/Bip01_Neck/Bip01_Neck1/Bip01_Head/BN_Eye_L_02
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/Bip01_Neck/Bip01_Neck1/Bip01_Head/BN_Eye_R_01
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/Bip01_Neck/Bip01_Neck1/Bip01_Head/BN_Eye_R_02
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/Bip01_Neck/Bip01_Neck1/Bip01_Head/BN_Fur_01
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/Bip01_Neck/Bip01_Neck1/Bip01_Head/BN_Fur_01/BN_Fur_02
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/Bip01_Neck/Bip01_Neck1/Bip01_Head/BN_Fur_03
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/Bip01_Neck/Bip01_Neck1/Bip01_Head/BN_Fur_03/BN_Fur_04
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/Bip01_Neck/Bip01_Neck1/Bip01_Head/BN_Fur_05
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/Bip01_Neck/Bip01_Neck1/Bip01_Head/BN_Jaw
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/BN_Wing_L_01
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/BN_Wing_L_01/BN_Wing_L_02
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/BN_Wing_L_01/BN_Wing_L_02/BN_Wing_L_03
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/BN_Wing_L_01/BN_Wing_L_02/BN_Wing_L_03/BN_Wing_L_04
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/BN_Wing_L_01/BN_Wing_L_02/BN_Wing_L_06
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/BN_Wing_L_01/BN_Wing_L_02/BN_Wing_L_06/BN_Wing_L_07
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/BN_Wing_L_01/BN_Wing_L_05
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/BN_Wing_R_01
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/BN_Wing_R_01/BN_Wing_R_02
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/BN_Wing_R_01/BN_Wing_R_02/BN_Wing_R_03
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/BN_Wing_R_01/BN_Wing_R_02/BN_Wing_R_03/BN_Wing_R_04
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/BN_Wing_R_01/BN_Wing_R_02/BN_Wing_R_06
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/BN_Wing_R_01/BN_Wing_R_02/BN_Wing_R_06/BN_Wing_R_07
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/Bip01_Spine/Bip01_Spine1/BN_Wing_R_01/BN_Wing_R_05
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/BN_Tail_01
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/BN_Tail_01/BN_Tail_02
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/BN_Tail_01/BN_Tail_02/BN_Tail_03
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/BN_Tail_01/BN_Tail_02/BN_Tail_03/BN_Tail_04
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/BN_Tail_01/BN_Tail_02/BN_Tail_03/BN_Tail_04/BN_Tail_05
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/BN_Tail_01/BN_Tail_02/BN_Tail_06
+        weight: 1
+      - path: NParrot/Bip01_Pelvis/BN_Tail_01/BN_Tail_02/BN_Tail_07
+        weight: 1
+      - path: Parrot_A01
+        weight: 1
+      - path: Parrot_A01/Null
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
     isReadable: 1
   meshes:
     lODScreenPercentages: []
