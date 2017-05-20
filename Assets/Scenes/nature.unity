@@ -1978,7 +1978,7 @@ GameObject:
   - component: {fileID: 175559778}
   - component: {fileID: 175559777}
   m_Layer: 0
-  m_Name: Terrain Detailed
+  m_Name: Terrain Large
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6508,7 +6508,7 @@ GameObject:
   - component: {fileID: 673413769}
   - component: {fileID: 673413768}
   m_Layer: 0
-  m_Name: Terrain Large
+  m_Name: Terrain Center Detailed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
