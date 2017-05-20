@@ -114,7 +114,7 @@ public class Parrot : MonoBehaviour
         _audioCollision = audioSources.First(x => x.name == "AudioSourceCollision");
 
         // Ignore collisions between player bounding box (for collision detection) and its ragdoll colliders (for ragdoll effect)
-        Physics.IgnoreLayerCollision((int) Layers.Player, (int) Layers.PlayerRagdoll);
+//        Physics.IgnoreLayerCollision((int) Layers.Player, (int) Layers.PlayerRagdoll);
     }
 
     // On start, after Awake()
@@ -264,7 +264,8 @@ public class Parrot : MonoBehaviour
             SetState(BirdState.TakeOff);
             // Initial boost/jump
             _localVelocity = 5f * Vector3.forward + 5f * Vector3.up;
-            transform.position += _localVelocity * 0.2f;
+            transform.position = transform.position;
+//            transform.position += _localVelocity * 0.2f;
         }
     }
 
@@ -306,8 +307,8 @@ public class Parrot : MonoBehaviour
     void OnTriggerEnter(Collider col)
     {
         Debug.Log("Trigger enter: " + col.name);
-        if (_state == BirdState.TakeOff)
-            return;
+//        if (_state == BirdState.TakeOff)
+//            return;
 
         if (col.name.StartsWith("Terrain ") || col.tag == Tags.Finish)
         {
@@ -320,6 +321,11 @@ public class Parrot : MonoBehaviour
         {
             Crash(col);
         }
+    }
+
+    void OnTriggerStay(Collider col)
+    {
+//        Debug.Log("Trigger stay: " + col.name);
     }
 
     private void Land()
@@ -336,13 +342,13 @@ public class Parrot : MonoBehaviour
 
     private void Crash(Collider col)
     {
+        Debug.Log("Hit ground: " + col.name);
+
         Vector3 velocity = transform.TransformVector(_localVelocity);
 
         // Increase collision volume with speed, and use a minimum volume of 5%
         _audioCollision.volume = Mathf.Lerp(0.01f, 1, Mathf.InverseLerp(0, 30, velocity.magnitude));
         _audioCollision.Play();
-
-        Debug.Log("Hit ground: " + col.name);
 
         SetRagdollEnabled(true, velocity);
 
